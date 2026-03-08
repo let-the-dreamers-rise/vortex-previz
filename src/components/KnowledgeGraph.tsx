@@ -140,10 +140,22 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [birthTimes, setBirthTimes] = useState<Record<string, number>>({});
+  const seenDiscoveredRef = useRef<Set<string>>(new Set());
 
-  // Merge base nodes with domain and discovered nodes
+  // Merge base nodes with domain and discovered nodes — stamp birth times
   const domainExtra = activeDomain ? (DOMAIN_NODES[activeDomain] || []) : [];
   const allNodes = [...IDEA_NODES, ...domainExtra, ...discoveredNodes];
+
+  // Track when new discovered nodes appear and stamp with current internal time
+  useEffect(() => {
+    discoveredNodes.forEach(n => {
+      if (!seenDiscoveredRef.current.has(n.id)) {
+        seenDiscoveredRef.current.add(n.id);
+        setBirthTimes(prev => ({ ...prev, [n.id]: time }));
+      }
+    });
+  }, [discoveredNodes, time]);
 
   useEffect(() => {
     const interval = setInterval(() => setTime((t) => t + 0.016), 16);
@@ -326,8 +338,8 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
         )}
 
         {/* Birth convergence rays for newly discovered nodes */}
-        {discoveredNodes.filter(n => n.birthTime && (time - n.birthTime) < 3).map(node => {
-          const age = time - (node.birthTime || 0);
+        {discoveredNodes.filter(n => birthTimes[n.id] !== undefined && (time - birthTimes[n.id]) < 3).map(node => {
+          const age = time - (birthTimes[node.id] || 0);
           const parentNodes = allNodes.filter(p => node.connections.includes(p.id));
           return parentNodes.map(parent => {
             const progress = Math.min(1, age / 1.5);
@@ -360,8 +372,10 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
           const pulseScale = 1 + Math.sin(time * 1.8 + node.x * 0.01) * 0.04;
           const active = isSelected || isHovered || isHighlightTarget;
           const dimmed = selectedNode && !isSelected && !isConnected && !isHighlightTarget;
-          const isBorn = node.isDiscovered && node.birthTime && (time - node.birthTime) < 2;
-          const birthScale = isBorn ? Math.min(1, (time - (node.birthTime || 0)) / 0.8) : 1;
+          const nodeBirthTime = node.isDiscovered ? birthTimes[node.id] : undefined;
+          const isBorn = nodeBirthTime !== undefined && (time - nodeBirthTime) < 2;
+          const birthAge = nodeBirthTime !== undefined ? time - nodeBirthTime : 0;
+          const birthScale = isBorn ? Math.min(1, birthAge / 0.8) : 1;
 
           return (
             <g
@@ -377,16 +391,16 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
               {isBorn && (
                 <>
                   <circle
-                    r={node.size * (2 + (time - (node.birthTime || 0)) * 4)}
+                    r={node.size * (2 + birthAge * 4)}
                     fill="none"
                     stroke={node.color}
-                    strokeWidth={2 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 2))}
-                    opacity={0.5 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 2))}
+                    strokeWidth={2 * (1 - Math.min(1, birthAge / 2))}
+                    opacity={0.5 * (1 - Math.min(1, birthAge / 2))}
                   />
                   <circle
-                    r={node.size * (1 + (time - (node.birthTime || 0)) * 2)}
+                    r={node.size * (1 + birthAge * 2)}
                     fill={node.color}
-                    opacity={0.15 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 1.5))}
+                    opacity={0.15 * (1 - Math.min(1, birthAge / 1.5))}
                     filter="url(#blur-heavy)"
                   />
                 </>

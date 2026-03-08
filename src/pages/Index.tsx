@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticleBackground from "@/components/ParticleBackground";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 import type { IdeaNode } from "@/components/KnowledgeGraph";
+import { IDEA_NODES, DOMAIN_NODES } from "@/components/KnowledgeGraph";
 import IdeaGenomePanel from "@/components/IdeaGenomePanel";
 import EvolutionTimeline from "@/components/EvolutionTimeline";
 import AIDiscoveryPanel from "@/components/AIDiscoveryPanel";
@@ -18,11 +19,9 @@ const Index = () => {
   const [highlightedNodeIds, setHighlightedNodeIds] = useState<string[]>([]);
 
   const handleDiscovery = useCallback((node: IdeaNode) => {
-    // Add birth timestamp for animation
-    const withBirth = { ...node, birthTime: performance.now() / 1000 };
     setDiscoveredNodes(prev => {
       if (prev.some(n => n.id === node.id)) return prev;
-      return [...prev, withBirth];
+      return [...prev, node];
     });
   }, []);
 
@@ -30,10 +29,17 @@ const Index = () => {
     setActiveDomain(prev => prev === domain ? null : domain);
   }, []);
 
+  const { nodeCount, linkCount } = useMemo(() => {
+    const domainExtra = activeDomain ? (DOMAIN_NODES[activeDomain] || []) : [];
+    const allNodes = [...IDEA_NODES, ...domainExtra, ...discoveredNodes];
+    const links = allNodes.reduce((sum, n) => sum + n.connections.filter(c => allNodes.some(a => a.id === c)).length, 0);
+    return { nodeCount: allNodes.length, linkCount: links };
+  }, [activeDomain, discoveredNodes]);
+
   return (
     <div className="w-screen h-screen overflow-hidden bg-background relative">
       <ParticleBackground />
-      <TopBar />
+      <TopBar nodeCount={nodeCount} linkCount={linkCount} />
       <HUDOverlay />
 
       {/* Cinematic intro */}

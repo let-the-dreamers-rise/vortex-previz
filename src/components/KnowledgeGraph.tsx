@@ -338,8 +338,8 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
         )}
 
         {/* Birth convergence rays for newly discovered nodes */}
-        {discoveredNodes.filter(n => n.birthTime && (time - n.birthTime) < 3).map(node => {
-          const age = time - (node.birthTime || 0);
+        {discoveredNodes.filter(n => birthTimes[n.id] !== undefined && (time - birthTimes[n.id]) < 3).map(node => {
+          const age = time - (birthTimes[node.id] || 0);
           const parentNodes = allNodes.filter(p => node.connections.includes(p.id));
           return parentNodes.map(parent => {
             const progress = Math.min(1, age / 1.5);

@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticleBackground from "@/components/ParticleBackground";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 import type { IdeaNode } from "@/components/KnowledgeGraph";
+import { IDEA_NODES, DOMAIN_NODES } from "@/components/KnowledgeGraph";
 import IdeaGenomePanel from "@/components/IdeaGenomePanel";
 import EvolutionTimeline from "@/components/EvolutionTimeline";
 import AIDiscoveryPanel from "@/components/AIDiscoveryPanel";

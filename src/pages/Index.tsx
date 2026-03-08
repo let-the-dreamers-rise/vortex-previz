@@ -29,10 +29,17 @@ const Index = () => {
     setActiveDomain(prev => prev === domain ? null : domain);
   }, []);
 
+  const { nodeCount, linkCount } = useMemo(() => {
+    const domainExtra = activeDomain ? (DOMAIN_NODES[activeDomain] || []) : [];
+    const allNodes = [...IDEA_NODES, ...domainExtra, ...discoveredNodes];
+    const links = allNodes.reduce((sum, n) => sum + n.connections.filter(c => allNodes.some(a => a.id === c)).length, 0);
+    return { nodeCount: allNodes.length, linkCount: links };
+  }, [activeDomain, discoveredNodes]);
+
   return (
     <div className="w-screen h-screen overflow-hidden bg-background relative">
       <ParticleBackground />
-      <TopBar />
+      <TopBar nodeCount={nodeCount} linkCount={linkCount} />
       <HUDOverlay />
 
       {/* Cinematic intro */}

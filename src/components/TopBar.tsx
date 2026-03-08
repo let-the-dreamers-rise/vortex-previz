@@ -2,7 +2,12 @@ import { motion } from "framer-motion";
 import { Dna, Sparkles, Activity, Radar, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const TopBar = () => {
+interface Props {
+  nodeCount?: number;
+  linkCount?: number;
+}
+
+const TopBar = ({ nodeCount = 10, linkCount = 14 }: Props) => {
   const [uptime, setUptime] = useState(0);
   useEffect(() => {
     const i = setInterval(() => setUptime((t) => t + 1), 1000);

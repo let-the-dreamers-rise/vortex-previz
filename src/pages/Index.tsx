@@ -18,11 +18,9 @@ const Index = () => {
   const [highlightedNodeIds, setHighlightedNodeIds] = useState<string[]>([]);
 
   const handleDiscovery = useCallback((node: IdeaNode) => {
-    // Add birth timestamp for animation
-    const withBirth = { ...node, birthTime: performance.now() / 1000 };
     setDiscoveredNodes(prev => {
       if (prev.some(n => n.id === node.id)) return prev;
-      return [...prev, withBirth];
+      return [...prev, node];
     });
   }, []);
 

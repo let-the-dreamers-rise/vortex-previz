@@ -55,11 +55,11 @@ const TopBar = ({ nodeCount = 10, linkCount = 14 }: Props) => {
           <div className="hidden md:flex items-center gap-2 glass rounded-full px-4 py-2 border border-glass-border/40">
             <Activity className="w-3 h-3 text-neon-cyan" />
             <span className="text-[10px] font-mono text-muted-foreground">
-              NODES <span className="text-neon-cyan font-bold">10</span>
+              NODES <span className="text-neon-cyan font-bold">{nodeCount}</span>
             </span>
             <div className="w-px h-3 bg-border/40" />
             <span className="text-[10px] font-mono text-muted-foreground">
-              LINKS <span className="text-neon-purple font-bold">14</span>
+              LINKS <span className="text-neon-purple font-bold">{linkCount}</span>
             </span>
           </div>
 

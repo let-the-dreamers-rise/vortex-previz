@@ -140,10 +140,22 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [birthTimes, setBirthTimes] = useState<Record<string, number>>({});
+  const seenDiscoveredRef = useRef<Set<string>>(new Set());
 
-  // Merge base nodes with domain and discovered nodes
+  // Merge base nodes with domain and discovered nodes — stamp birth times
   const domainExtra = activeDomain ? (DOMAIN_NODES[activeDomain] || []) : [];
   const allNodes = [...IDEA_NODES, ...domainExtra, ...discoveredNodes];
+
+  // Track when new discovered nodes appear and stamp with current internal time
+  useEffect(() => {
+    discoveredNodes.forEach(n => {
+      if (!seenDiscoveredRef.current.has(n.id)) {
+        seenDiscoveredRef.current.add(n.id);
+        setBirthTimes(prev => ({ ...prev, [n.id]: time }));
+      }
+    });
+  }, [discoveredNodes, time]);
 
   useEffect(() => {
     const interval = setInterval(() => setTime((t) => t + 0.016), 16);

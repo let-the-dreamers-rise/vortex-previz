@@ -372,8 +372,10 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
           const pulseScale = 1 + Math.sin(time * 1.8 + node.x * 0.01) * 0.04;
           const active = isSelected || isHovered || isHighlightTarget;
           const dimmed = selectedNode && !isSelected && !isConnected && !isHighlightTarget;
-          const isBorn = node.isDiscovered && node.birthTime && (time - node.birthTime) < 2;
-          const birthScale = isBorn ? Math.min(1, (time - (node.birthTime || 0)) / 0.8) : 1;
+          const nodeBirthTime = node.isDiscovered ? birthTimes[node.id] : undefined;
+          const isBorn = nodeBirthTime !== undefined && (time - nodeBirthTime) < 2;
+          const birthAge = nodeBirthTime !== undefined ? time - nodeBirthTime : 0;
+          const birthScale = isBorn ? Math.min(1, birthAge / 0.8) : 1;
 
           return (
             <g
@@ -389,16 +391,16 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
               {isBorn && (
                 <>
                   <circle
-                    r={node.size * (2 + (time - (node.birthTime || 0)) * 4)}
+                    r={node.size * (2 + birthAge * 4)}
                     fill="none"
                     stroke={node.color}
-                    strokeWidth={2 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 2))}
-                    opacity={0.5 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 2))}
+                    strokeWidth={2 * (1 - Math.min(1, birthAge / 2))}
+                    opacity={0.5 * (1 - Math.min(1, birthAge / 2))}
                   />
                   <circle
-                    r={node.size * (1 + (time - (node.birthTime || 0)) * 2)}
+                    r={node.size * (1 + birthAge * 2)}
                     fill={node.color}
-                    opacity={0.15 * (1 - Math.min(1, (time - (node.birthTime || 0)) / 1.5))}
+                    opacity={0.15 * (1 - Math.min(1, birthAge / 1.5))}
                     filter="url(#blur-heavy)"
                   />
                 </>

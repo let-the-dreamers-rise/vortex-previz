@@ -180,6 +180,18 @@ const Index = () => {
 
       {/* Chat Panel */}
       <ChatPanel onExplore={handleExplore} />
+
+      {/* Replay button */}
+      <button
+        onClick={() => setShowReplay(true)}
+        className="fixed top-6 right-6 z-30 flex items-center gap-2 px-4 py-2 glass rounded-full text-[11px] font-mono text-primary border-primary/20 hover:bg-primary/10 transition-all cursor-pointer glow-cyan"
+      >
+        <Play className="w-3.5 h-3.5" />
+        REPLAY
+      </button>
+
+      {/* Discovery Replay */}
+      <DiscoveryReplay open={showReplay} onClose={() => setShowReplay(false)} />
     </div>
   );
 };

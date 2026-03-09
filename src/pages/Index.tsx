@@ -10,9 +10,12 @@ import AIDiscoveryPanel from "@/components/AIDiscoveryPanel";
 import ChatPanel from "@/components/ChatPanel";
 import TopBar from "@/components/TopBar";
 import HUDOverlay from "@/components/HUDOverlay";
+import DiscoveryReplay from "@/components/DiscoveryReplay";
+import { Play } from "lucide-react";
 
 const Index = () => {
   const [selectedNode, setSelectedNode] = useState<IdeaNode | null>(null);
+  const [showReplay, setShowReplay] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [discoveredNodes, setDiscoveredNodes] = useState<IdeaNode[]>([]);
   const [activeDomain, setActiveDomain] = useState<string | null>(null);

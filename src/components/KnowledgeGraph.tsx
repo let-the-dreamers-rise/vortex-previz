@@ -172,12 +172,14 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if ((e.target as SVGElement).closest(".idea-node")) return;
     setDragging(true);
+    didDrag.current = false;
     dragStart.current = { x: e.clientX - offset.x, y: e.clientY - offset.y };
   }, [offset]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setMousePos({ x: e.clientX, y: e.clientY });
     if (!dragging) return;
+    didDrag.current = true;
     setOffset({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y });
   }, [dragging]);
 

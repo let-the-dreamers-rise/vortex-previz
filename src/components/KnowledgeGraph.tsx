@@ -600,6 +600,7 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
           fill="hsl(180, 70%, 50%)"
           opacity={0.015}
           filter="url(#blur-mega)"
+          pointerEvents="none"
         />
       </g>
     </svg>

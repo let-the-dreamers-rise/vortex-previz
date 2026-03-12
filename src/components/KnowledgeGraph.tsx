@@ -385,11 +385,13 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
               key={node.id}
               className="idea-node cursor-pointer"
               transform={`translate(${node.x + floatX}, ${node.y + floatY}) scale(${birthScale})`}
-              onClick={() => onSelectNode(isSelected ? null : node)}
+              onClick={(e) => { e.stopPropagation(); onSelectNode(isSelected ? null : node); }}
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
               style={{ transition: "opacity 0.4s" }}
             >
+              {/* Invisible large hit target */}
+              <circle r={node.size * 2.5} fill="transparent" />
               {/* Birth explosion ring */}
               {isBorn && (
                 <>

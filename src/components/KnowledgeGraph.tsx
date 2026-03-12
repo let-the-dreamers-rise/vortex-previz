@@ -137,6 +137,7 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const [scale, setScale] = useState(1);
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  const didDrag = useRef(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -171,12 +172,14 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if ((e.target as SVGElement).closest(".idea-node")) return;
     setDragging(true);
+    didDrag.current = false;
     dragStart.current = { x: e.clientX - offset.x, y: e.clientY - offset.y };
   }, [offset]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setMousePos({ x: e.clientX, y: e.clientY });
     if (!dragging) return;
+    didDrag.current = true;
     setOffset({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y });
   }, [dragging]);
 
@@ -302,10 +305,10 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
                 <path
                   d={`M ${node.x} ${node.y} Q ${midX} ${midY} ${target.x} ${target.y}`}
                   fill="none"
-                  stroke={isHighlighted ? "hsl(180, 80%, 60%)" : "hsl(220, 30%, 20%)"}
-                  strokeWidth={isHighlighted ? 1.8 : breathe}
-                  strokeOpacity={isHighlighted ? 0.9 : 0.15}
-                  style={{ transition: "stroke-opacity 0.5s, stroke 0.5s" }}
+                  stroke={isHighlighted ? "hsl(180, 80%, 60%)" : "hsl(200, 30%, 35%)"}
+                  strokeWidth={isHighlighted ? 2.2 : breathe + 0.3}
+                  strokeOpacity={isHighlighted ? 0.95 : 0.35}
+                  style={{ transition: "stroke-opacity 0.5s, stroke 0.5s, stroke-width 0.3s" }}
                 />
               </g>
             );
@@ -382,11 +385,13 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
               key={node.id}
               className="idea-node cursor-pointer"
               transform={`translate(${node.x + floatX}, ${node.y + floatY}) scale(${birthScale})`}
-              onClick={() => onSelectNode(isSelected ? null : node)}
+              onClick={(e) => { e.stopPropagation(); onSelectNode(isSelected ? null : node); }}
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
               style={{ transition: "opacity 0.4s" }}
             >
+              {/* Invisible large hit target */}
+              <circle r={node.size * 2.5} fill="transparent" />
               {/* Birth explosion ring */}
               {isBorn && (
                 <>

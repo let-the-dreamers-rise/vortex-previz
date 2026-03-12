@@ -137,6 +137,7 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const [scale, setScale] = useState(1);
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  const didDrag = useRef(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

@@ -305,10 +305,10 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
                 <path
                   d={`M ${node.x} ${node.y} Q ${midX} ${midY} ${target.x} ${target.y}`}
                   fill="none"
-                  stroke={isHighlighted ? "hsl(180, 80%, 60%)" : "hsl(220, 30%, 20%)"}
-                  strokeWidth={isHighlighted ? 1.8 : breathe}
-                  strokeOpacity={isHighlighted ? 0.9 : 0.15}
-                  style={{ transition: "stroke-opacity 0.5s, stroke 0.5s" }}
+                  stroke={isHighlighted ? "hsl(180, 80%, 60%)" : "hsl(200, 30%, 35%)"}
+                  strokeWidth={isHighlighted ? 2.2 : breathe + 0.3}
+                  strokeOpacity={isHighlighted ? 0.95 : 0.35}
+                  style={{ transition: "stroke-opacity 0.5s, stroke 0.5s, stroke-width 0.3s" }}
                 />
               </g>
             );

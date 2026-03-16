@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Send, X, Bot, User, Compass, Sparkles } from "lucide-react";
+import { MessageCircle, Send, X, Bot, User, Compass, Sparkles, Globe, Loader2 } from "lucide-react";
+import { sendChatMessage, type ChatResult } from "@/lib/api";
 
 interface Message {
   role: "user" | "assistant";
@@ -20,6 +21,7 @@ const DOMAIN_KEYWORDS: Record<string, string> = {
   string: "physics",
 };
 
+// Fallback mock responses used when backend is unavailable
 const mockResponses: Record<string, string> = {
   default: "I can help you explore the evolution of ideas. Try:\n\n🧠 **\"Explore neuroscience\"** — brain plasticity, consciousness\n🤖 **\"Explore robotics\"** — reinforcement learning, embodied AI\n⚛️ **\"Explore physics\"** — quantum computing, string theory\n\nOr ask about specific concepts like transformers, diffusion models, or the future of AI.",
   neural: "**Neural Networks** trace back to 1943 with the McCulloch-Pitts model.\n\n◉ **1943** — Mathematical neuron model\n◈ **1957** — Perceptron (single-layer learning)\n⊶ **1986** — Backpropagation enables deep training\n⊶ **1997** — LSTM introduces long-term memory\n⊕ **2012** — AlexNet sparks the deep learning revolution\n\nGenome: Complexity 85% · Adoption 95% · Influence 98%",
@@ -37,10 +39,13 @@ interface Props {
 const ChatPanel = ({ onExplore }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Welcome to IdeaGenome. I'm your guide to the knowledge universe.\n\nTry **\"Explore neuroscience\"** or **\"Explore robotics\"** to shift the graph to new domains.", type: "text" },
+    { role: "assistant", content: "Welcome to IdeaGenome. I'm your AI guide to the knowledge universe — powered by **Gemini**.\n\nTry **\"Explore neuroscience\"** or **\"Explore robotics\"** to shift the graph to new domains.", type: "text" },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isExploring, setIsExploring] = useState(false);
+  const [customDomain, setCustomDomain] = useState("");
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,10 +54,19 @@ const ChatPanel = ({ onExplore }: Props) => {
     }
   }, [messages]);
 
-  const getResponse = (msg: string): { text: string; domain?: string } => {
+  // Fallback: detect domain from local keyword matching
+  const detectDomain = (msg: string): string | undefined => {
     const lower = msg.toLowerCase();
+    if (lower.includes("explore")) {
+      for (const [keyword, domain] of Object.entries(DOMAIN_KEYWORDS)) {
+        if (lower.includes(keyword)) return domain;
+      }
+    }
+    return undefined;
+  };
 
-    // Check for exploration commands
+  const getMockResponse = (msg: string): { text: string; domain?: string } => {
+    const lower = msg.toLowerCase();
     if (lower.includes("explore")) {
       for (const [keyword, domain] of Object.entries(DOMAIN_KEYWORDS)) {
         if (lower.includes(keyword)) {
@@ -66,7 +80,7 @@ const ChatPanel = ({ onExplore }: Props) => {
     return { text: mockResponses.default };
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     const userMsg: Message = { role: "user", content: input, type: "text" };
     setMessages((prev) => [...prev, userMsg]);
@@ -74,29 +88,62 @@ const ChatPanel = ({ onExplore }: Props) => {
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const { text, domain } = getResponse(userInput);
-      setMessages((prev) => [...prev, { role: "assistant", content: text, type: domain ? "exploration" : "text" }]);
+    // Try backend API first
+    const { data, error } = await sendChatMessage(userInput, sessionId);
+
+    if (data && !error) {
+      // Real AI response from Gemini
+      setSessionId(data.session_id);
+      const domain = data.discovered_domain || detectDomain(userInput);
+      setMessages((prev) => [...prev, {
+        role: "assistant",
+        content: data.response,
+        type: domain ? "exploration" : "text",
+      }]);
       setIsTyping(false);
       if (domain) {
         onExplore?.(domain);
       }
-    }, 1000);
+    } else {
+      // Fallback to mock responses
+      setTimeout(() => {
+        const { text, domain } = getMockResponse(userInput);
+        setMessages((prev) => [...prev, { role: "assistant", content: text, type: domain ? "exploration" : "text" }]);
+        setIsTyping(false);
+        if (domain) {
+          onExplore?.(domain);
+        }
+      }, 800);
+    }
   };
 
   const quickExplore = (domain: string) => {
     setInput(`Explore ${domain}`);
-    setTimeout(() => {
+    setTimeout(async () => {
       const userMsg: Message = { role: "user", content: `Explore ${domain}`, type: "text" };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
-      setTimeout(() => {
-        const { text } = getResponse(`explore ${domain}`);
-        setMessages((prev) => [...prev, { role: "assistant", content: text, type: "exploration" }]);
+      setInput("");
+
+      const { data, error } = await sendChatMessage(`Explore ${domain}`, sessionId);
+
+      if (data && !error) {
+        setSessionId(data.session_id);
+        setMessages((prev) => [...prev, {
+          role: "assistant",
+          content: data.response,
+          type: "exploration",
+        }]);
         setIsTyping(false);
         onExplore?.(domain);
-      }, 800);
-      setInput("");
+      } else {
+        setTimeout(() => {
+          const { text } = getMockResponse(`explore ${domain}`);
+          setMessages((prev) => [...prev, { role: "assistant", content: text, type: "exploration" }]);
+          setIsTyping(false);
+          onExplore?.(domain);
+        }, 800);
+      }
     }, 100);
   };
 
@@ -151,7 +198,7 @@ const ChatPanel = ({ onExplore }: Props) => {
                   <span className="text-sm font-bold text-foreground">IdeaGenome AI</span>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse-glow" />
-                    <span className="text-[8px] font-mono text-muted-foreground tracking-wider">EXPLORATION MODE</span>
+                    <span className="text-[8px] font-mono text-muted-foreground tracking-wider">GEMINI-POWERED</span>
                   </div>
                 </div>
               </div>
@@ -160,23 +207,74 @@ const ChatPanel = ({ onExplore }: Props) => {
               </button>
             </div>
 
-            {/* Quick explore buttons */}
-            <div className="px-4 py-2 border-b border-border/30 flex gap-2">
-              {[
-                { domain: "neuroscience", icon: "🧠", label: "Neuroscience" },
-                { domain: "robotics", icon: "🤖", label: "Robotics" },
-                { domain: "physics", icon: "⚛️", label: "Physics" },
-              ].map(({ domain, icon, label }) => (
+            {/* Domain Explorer */}
+            <div className="px-3 py-2.5 border-b border-border/30">
+              {/* Preset domain buttons - 2 rows */}
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {[
+                  { domain: "neuroscience", icon: "🧠", label: "Brain" },
+                  { domain: "robotics", icon: "🤖", label: "Robotics" },
+                  { domain: "physics", icon: "⚛️", label: "Physics" },
+                  { domain: "automobiles", icon: "🚗", label: "Auto" },
+                  { domain: "space exploration", icon: "🚀", label: "Space" },
+                  { domain: "medicine", icon: "💊", label: "Medicine" },
+                  { domain: "music", icon: "🎵", label: "Music" },
+                  { domain: "biology", icon: "🧬", label: "Biology" },
+                  { domain: "economics", icon: "📈", label: "Economics" },
+                  { domain: "architecture", icon: "🏛️", label: "Architecture" },
+                  { domain: "energy", icon: "⚡", label: "Energy" },
+                  { domain: "philosophy", icon: "💭", label: "Philosophy" },
+                ].map(({ domain, icon, label }) => (
+                  <button
+                    key={domain}
+                    onClick={() => {
+                      setIsExploring(true);
+                      quickExplore(domain);
+                      setTimeout(() => setIsExploring(false), 3000);
+                    }}
+                    disabled={isExploring}
+                    className="px-2 py-1 rounded-md glass text-[9px] font-mono text-muted-foreground hover:text-foreground hover:bg-neon-cyan/5 transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  >
+                    <span>{icon}</span>
+                    <span>{label}</span>
+                  </button>
+                ))}
+              </div>
+              {/* Custom domain input */}
+              <div className="flex gap-1.5">
+                <div className="flex-1 relative">
+                  <Globe className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                  <input
+                    value={customDomain}
+                    onChange={(e) => setCustomDomain(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && customDomain.trim()) {
+                        setIsExploring(true);
+                        quickExplore(customDomain.trim());
+                        setCustomDomain("");
+                        setTimeout(() => setIsExploring(false), 5000);
+                      }
+                    }}
+                    placeholder="Type any domain: cooking, fashion, gaming..."
+                    className="w-full pl-7 pr-2 py-1.5 rounded-md glass text-[10px] font-mono text-foreground placeholder:text-muted-foreground/50 border border-glass-border focus:border-neon-cyan/40 focus:outline-none transition-colors"
+                  />
+                </div>
                 <button
-                  key={domain}
-                  onClick={() => quickExplore(domain)}
-                  className="px-3 py-1.5 rounded-lg glass text-[10px] font-mono text-muted-foreground hover:text-foreground hover:bg-neon-cyan/5 transition-all flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => {
+                    if (customDomain.trim()) {
+                      setIsExploring(true);
+                      quickExplore(customDomain.trim());
+                      setCustomDomain("");
+                      setTimeout(() => setIsExploring(false), 5000);
+                    }
+                  }}
+                  disabled={!customDomain.trim() || isExploring}
+                  className="px-3 py-1.5 rounded-md bg-neon-cyan/10 border border-neon-cyan/30 text-[9px] font-mono text-neon-cyan hover:bg-neon-cyan/20 disabled:opacity-30 transition-all flex items-center gap-1"
                 >
-                  <span>{icon}</span>
-                  <span>{label}</span>
-                  <Compass className="w-2.5 h-2.5" />
+                  {isExploring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Compass className="w-3 h-3" />}
+                  EXPLORE
                 </button>
-              ))}
+              </div>
             </div>
 
             {/* Messages */}

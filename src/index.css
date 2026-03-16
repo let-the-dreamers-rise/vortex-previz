@@ -6,59 +6,48 @@
 
 @layer base {
   :root {
-    --background: 230 25% 5%;
-    --foreground: 200 20% 90%;
+    --background: 240 10% 2%;
+    --foreground: 210 20% 98%;
 
-    --card: 230 25% 8%;
-    --card-foreground: 200 20% 90%;
+    --card: 240 10% 4%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 230 25% 8%;
-    --popover-foreground: 200 20% 90%;
+    --popover: 240 10% 4%;
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 180 80% 50%;
-    --primary-foreground: 230 25% 5%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 240 10% 2%;
 
-    --secondary: 230 20% 14%;
-    --secondary-foreground: 200 20% 85%;
+    --secondary: 240 10% 8%;
+    --secondary-foreground: 210 20% 80%;
 
-    --muted: 230 20% 12%;
-    --muted-foreground: 220 15% 55%;
+    --muted: 240 10% 8%;
+    --muted-foreground: 210 15% 50%;
 
-    --accent: 270 60% 55%;
-    --accent-foreground: 200 20% 95%;
+    --accent: 280 100% 60%;
+    --accent-foreground: 210 20% 98%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 180 80% 50%;
+    --border: 240 10% 15%;
+    --input: 240 10% 15%;
+    --ring: 180 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom tokens */
-    --neon-cyan: 180 80% 50%;
-    --neon-teal: 170 70% 45%;
-    --neon-purple: 270 60% 55%;
-    --neon-pink: 320 70% 55%;
-    --neon-blue: 210 80% 55%;
-    --deep-space: 230 25% 5%;
-    --nebula: 250 30% 12%;
-    --glass: 230 25% 12%;
-    --glass-border: 220 20% 22%;
+    /* Custom Vortex Tokens */
+    --neon-cyan: 180 100% 45%;
+    --neon-teal: 170 90% 40%;
+    --neon-purple: 280 100% 60%;
+    --neon-pink: 320 100% 55%;
+    --deep-space: 240 15% 3%;
+    --glass: 240 10% 5%;
+    --glass-border: 180 100% 50%;
 
-    --glow-cyan: 0 0 20px hsl(180 80% 50% / 0.4), 0 0 60px hsl(180 80% 50% / 0.15);
-    --glow-purple: 0 0 20px hsl(270 60% 55% / 0.4), 0 0 60px hsl(270 60% 55% / 0.15);
-    --glow-pink: 0 0 20px hsl(320 70% 55% / 0.4), 0 0 60px hsl(320 70% 55% / 0.15);
-
-    --sidebar-background: 230 25% 7%;
-    --sidebar-foreground: 200 20% 85%;
-    --sidebar-primary: 180 80% 50%;
-    --sidebar-primary-foreground: 230 25% 5%;
-    --sidebar-accent: 230 20% 14%;
-    --sidebar-accent-foreground: 200 20% 85%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 180 80% 50%;
+    --glow-cyan: 0 0 15px hsl(180 100% 50% / 0.5), 0 0 40px hsl(180 100% 50% / 0.2);
+    --glow-purple: 0 0 15px hsl(280 100% 60% / 0.5), 0 0 40px hsl(280 100% 60% / 0.2);
+    --glow-pink: 0 0 15px hsl(320 100% 55% / 0.5), 0 0 40px hsl(320 100% 55% / 0.2);
   }
 }
 
@@ -78,12 +67,28 @@
 }
 
 @layer utilities {
+  .vortex-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, hsl(var(--neon-cyan)/0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--neon-cyan)/0.03) 1px, transparent 1px);
+  }
+
   .glass {
-    @apply bg-glass/40 backdrop-blur-xl border border-glass-border/50;
+    @apply bg-background/80 backdrop-blur-md border border-glass-border/20;
   }
 
   .glass-strong {
-    @apply bg-glass/60 backdrop-blur-2xl border border-glass-border/70;
+    @apply bg-background/95 backdrop-blur-2xl border border-glass-border/40;
+  }
+
+  .tech-bezel {
+    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+  }
+
+  .scanline {
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 255, 255, 0.2) 50%, transparent 100%);
+    animation: scan 4s linear infinite;
   }
 
   .glow-cyan {
@@ -118,4 +123,14 @@
   .scrollbar-hidden::-webkit-scrollbar {
     display: none;
   }
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(200%) skewX(-12deg); }
 }

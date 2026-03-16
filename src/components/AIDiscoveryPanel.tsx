@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, ArrowDown, Zap, Search, ChevronDown, ChevronUp, FlaskConical, Dna, Target, TrendingUp, Lightbulb, Plus, Layers } from "lucide-react";
 import { IDEA_NODES, type IdeaNode } from "./KnowledgeGraph";
+import { runDiscovery, type DiscoveryResult } from "@/lib/api";
 
 interface DiscoveredIdea {
   name: string;
@@ -26,22 +27,8 @@ const TRAIT_MAP: Record<string, string[]> = {
   "neuro-symbolic": ["logical reasoning", "symbolic grounding", "rule extraction", "hybrid inference"],
 };
 
-function generateDiscovery(parentIds: string[]): DiscoveredIdea {
-  const parents = parentIds.map(id => IDEA_NODES.find(n => n.id === id)!).filter(Boolean);
-  const allTraits = parentIds.flatMap(id => TRAIT_MAP[id] || []);
-  const combinedTraits = allTraits.filter((_, i) => i % 2 === 0).slice(0, 5);
-  const avgComplexity = parents.reduce((s, p) => s + p.traits.complexity, 0) / parents.length;
-  const avgAdoption = parents.reduce((s, p) => s + p.traits.adoption, 0) / parents.length;
-  const avgInfluence = parents.reduce((s, p) => s + p.traits.influence, 0) / parents.length;
-  const novelty = Math.min(99, Math.round(avgComplexity * 0.6 + (parents.length * 8) + Math.random() * 10));
-  const feasibility = Math.min(99, Math.round(avgAdoption * 0.5 + 30 + Math.random() * 15));
-  const impact = Math.min(99, Math.round(avgInfluence * 0.7 + Math.random() * 12));
-  const hues = parents.map(p => { const m = p.color.match(/hsl\((\d+)/); return m ? parseInt(m[1]) : 180; });
-  const avgHue = Math.round(hues.reduce((a, b) => a + b, 0) / hues.length);
-  return { name: "", parents, combinedTraits, scores: { novelty, feasibility, impact }, description: "", color: `hsl(${avgHue}, 75%, 55%)`, architectureLayers: [] };
-}
-
-const DISCOVERY_COMBOS: { parentIds: string[]; name: string; description: string; architectureLayers: string[] }[] = [
+// Fallback combos from original (used if backend unavailable)
+const FALLBACK_COMBOS: { parentIds: string[]; name: string; description: string; architectureLayers: string[] }[] = [
   {
     parentIds: ["transformers", "backpropagation", "quantum-ml"],
     name: "Quantum Attention Optimizer",
@@ -68,6 +55,21 @@ const DISCOVERY_COMBOS: { parentIds: string[]; name: string; description: string
   },
 ];
 
+function generateFallbackDiscovery(parentIds: string[]): DiscoveredIdea {
+  const parents = parentIds.map(id => IDEA_NODES.find(n => n.id === id)!).filter(Boolean);
+  const allTraits = parentIds.flatMap(id => TRAIT_MAP[id] || []);
+  const combinedTraits = allTraits.filter((_, i) => i % 2 === 0).slice(0, 5);
+  const avgComplexity = parents.reduce((s, p) => s + p.traits.complexity, 0) / parents.length;
+  const avgAdoption = parents.reduce((s, p) => s + p.traits.adoption, 0) / parents.length;
+  const avgInfluence = parents.reduce((s, p) => s + p.traits.influence, 0) / parents.length;
+  const novelty = Math.min(99, Math.round(avgComplexity * 0.6 + (parents.length * 8) + Math.random() * 10));
+  const feasibility = Math.min(99, Math.round(avgAdoption * 0.5 + 30 + Math.random() * 15));
+  const impact = Math.min(99, Math.round(avgInfluence * 0.7 + Math.random() * 12));
+  const hues = parents.map(p => { const m = p.color.match(/hsl\((\d+)/); return m ? parseInt(m[1]) : 180; });
+  const avgHue = Math.round(hues.reduce((a, b) => a + b, 0) / hues.length);
+  return { name: "", parents, combinedTraits, scores: { novelty, feasibility, impact }, description: "", color: `hsl(${avgHue}, 75%, 55%)`, architectureLayers: [] };
+}
+
 type Phase = "idle" | "scanning" | "extracting" | "combining" | "scoring" | "complete";
 
 const PHASE_LABELS: Record<Phase, string> = {
@@ -93,9 +95,10 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
   const [visibleParents, setVisibleParents] = useState(0);
   const [showScores, setShowScores] = useState(false);
   const [addedToGraph, setAddedToGraph] = useState<Set<string>>(new Set());
+  const [useAI, setUseAI] = useState(true); // Whether we're using real Gemini AI
 
-  const runDiscovery = useCallback((comboIndex: number) => {
-    const combo = DISCOVERY_COMBOS[comboIndex];
+  const runDiscoveryFlow = useCallback(async (comboIndex: number) => {
+    const combo = FALLBACK_COMBOS[comboIndex];
     setPhase("scanning");
     setVisibleTraits(0);
     setVisibleParents(0);
@@ -105,18 +108,47 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
     // Highlight parent nodes in graph
     onHighlightNodes?.(combo.parentIds);
 
-    setTimeout(() => {
+    // Start scanning animation
+    setTimeout(async () => {
       setPhase("extracting");
-      const disc = generateDiscovery(combo.parentIds);
-      disc.name = combo.name;
-      disc.description = combo.description;
-      disc.architectureLayers = combo.architectureLayers;
+
+      // Try real AI discovery
+      let disc: DiscoveredIdea;
+      const { data, error } = await runDiscovery(combo.parentIds);
+
+      if (data && !error) {
+        // Real Gemini-powered discovery!
+        setUseAI(true);
+        const parents = combo.parentIds.map(id => IDEA_NODES.find(n => n.id === id)!).filter(Boolean);
+        const hues = parents.map(p => { const m = p.color.match(/hsl\((\d+)/); return m ? parseInt(m[1]) : 180; });
+        const avgHue = Math.round(hues.reduce((a, b) => a + b, 0) / hues.length);
+
+        disc = {
+          name: data.idea.label,
+          parents: parents,
+          combinedTraits: data.combined_traits || [],
+          scores: data.scores,
+          description: data.idea.description,
+          color: data.idea.color || `hsl(${avgHue}, 75%, 55%)`,
+          architectureLayers: data.architecture_layers || [],
+        };
+      } else {
+        // Fallback to local generation
+        setUseAI(false);
+        disc = generateFallbackDiscovery(combo.parentIds);
+        disc.name = combo.name;
+        disc.description = combo.description;
+        disc.architectureLayers = combo.architectureLayers;
+      }
+
       setDiscovery(disc);
 
+      // Animate parent reveal
       disc.parents.forEach((_, i) => {
         setTimeout(() => setVisibleParents(i + 1), i * 400);
       });
 
+      // Animate trait reveal + scoring
       setTimeout(() => {
         setPhase("combining");
         disc.combinedTraits.forEach((_, i) => {
@@ -137,25 +169,24 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
   }, [onHighlightNodes]);
 
   useEffect(() => {
-    const timer = setTimeout(() => runDiscovery(0), 2000);
+    const timer = setTimeout(() => runDiscoveryFlow(0), 2000);
     return () => clearTimeout(timer);
-  }, [runDiscovery]);
+  }, [runDiscoveryFlow]);
 
   const nextDiscovery = () => {
-    const next = (currentCombo + 1) % DISCOVERY_COMBOS.length;
+    const next = (currentCombo + 1) % FALLBACK_COMBOS.length;
     setCurrentCombo(next);
-    runDiscovery(next);
+    runDiscoveryFlow(next);
   };
 
   const addToGraph = () => {
     if (!discovery) return;
-    const combo = DISCOVERY_COMBOS[currentCombo];
+    const combo = FALLBACK_COMBOS[currentCombo];
     const parentPositions = discovery.parents.map(p => ({ x: p.x, y: p.y }));
     const avgX = parentPositions.reduce((s, p) => s + p.x, 0) / parentPositions.length;
     const avgY = parentPositions.reduce((s, p) => s + p.y, 0) / parentPositions.length;
-    // Offset from center of parents
     const newNode: IdeaNode = {
-      id: `discovered-${combo.name.toLowerCase().replace(/\s+/g, '-')}`,
+      id: `discovered-${discovery.name.toLowerCase().replace(/\s+/g, '-')}`,
       label: discovery.name,
       x: avgX + (Math.random() - 0.5) * 80,
       y: avgY + 120 + Math.random() * 40,
@@ -176,7 +207,7 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
       isDiscovered: true,
     };
     onDiscovery?.(newNode);
-    setAddedToGraph(prev => new Set(prev).add(combo.name));
+    setAddedToGraph(prev => new Set(prev).add(discovery.name));
   };
 
   const isAdded = discovery ? addedToGraph.has(discovery.name) : false;
@@ -205,9 +236,14 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-foreground tracking-tight">AI Discovery Engine</h3>
-              <span className="text-[8px] font-mono text-muted-foreground tracking-[0.15em]">
-                {PHASE_LABELS[phase]}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[8px] font-mono text-muted-foreground tracking-[0.15em]">
+                  {PHASE_LABELS[phase]}
+                </span>
+                {useAI && phase === "complete" && (
+                  <span className="text-[7px] font-mono text-neon-cyan/60 tracking-wider">• GEMINI</span>
+                )}
+              </div>
             </div>
           </div>
           {expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronUp className="w-4 h-4 text-muted-foreground" />}
@@ -247,7 +283,6 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
                     <svg className="w-full h-full" viewBox="0 0 80 80">
                       <circle cx="40" cy="40" r="35" fill="none" stroke="hsl(var(--neon-cyan))" strokeWidth="1.5" strokeOpacity="0.15" strokeDasharray="6 10" />
                       <circle cx="40" cy="40" r="25" fill="none" stroke="hsl(var(--neon-cyan))" strokeWidth="0.8" strokeOpacity="0.25" strokeDasharray="3 8" />
-                      {/* Sweep */}
                       <line x1="40" y1="40" x2="40" y2="8" stroke="hsl(var(--neon-cyan))" strokeWidth="1.5" strokeOpacity="0.5" />
                     </svg>
                   </motion.div>
@@ -363,7 +398,6 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
                   className="glass-strong rounded-2xl p-5 relative overflow-hidden"
                   style={{ borderColor: `${discovery.color}44`, boxShadow: `0 0 30px ${discovery.color.replace(")", " / 0.08)")}` }}
                 >
-                  {/* Glow */}
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{ background: `radial-gradient(ellipse at 50% 0%, ${discovery.color.replace(")", " / 0.08)")}, transparent 70%)` }}
@@ -372,7 +406,9 @@ const AIDiscoveryPanel = ({ onDiscovery, onHighlightNodes }: Props) => {
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1.5">
                       <Lightbulb className="w-4 h-4" style={{ color: discovery.color }} />
-                      <span className="text-[9px] font-mono text-muted-foreground tracking-[0.2em]">EMERGING CONCEPT</span>
+                      <span className="text-[9px] font-mono text-muted-foreground tracking-[0.2em]">
+                        {useAI ? "AI-GENERATED CONCEPT" : "EMERGING CONCEPT"}
+                      </span>
                     </div>
                     <h4 className="text-base font-bold text-foreground mt-1" style={{ textShadow: `0 0 20px ${discovery.color.replace(")", " / 0.3)")}` }}>
                       {discovery.name}

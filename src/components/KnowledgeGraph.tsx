@@ -26,112 +26,28 @@ export interface IdeaNode {
 
 const IDEA_NODES: IdeaNode[] = [
   {
-    id: "neural-networks", label: "Neural Networks", x: 0, y: 0, size: 34,
-    color: "hsl(180, 80%, 50%)", glowColor: "hsl(180, 80%, 50%)", category: "AI",
-    connections: ["deep-learning", "backpropagation", "transformers"],
-    traits: { complexity: 85, adoption: 95, scalability: 90, influence: 98 },
-    description: "Computing systems inspired by biological neural networks, forming the foundation of modern AI.",
-    year: 1943, fields: ["AI", "Neuroscience", "Mathematics"],
-  },
-  {
-    id: "deep-learning", label: "Deep Learning", x: 220, y: -160, size: 28,
-    color: "hsl(270, 60%, 55%)", glowColor: "hsl(270, 60%, 55%)", category: "AI",
-    connections: ["neural-networks", "transformers", "generative-ai"],
-    traits: { complexity: 90, adoption: 92, scalability: 88, influence: 95 },
-    description: "Multi-layered neural networks that learn hierarchical representations of data.",
-    year: 2006, fields: ["AI", "Computer Vision", "NLP"],
-  },
-  {
-    id: "transformers", label: "Transformers", x: -200, y: -220, size: 30,
-    color: "hsl(320, 70%, 55%)", glowColor: "hsl(320, 70%, 55%)", category: "AI",
-    connections: ["neural-networks", "deep-learning", "attention"],
-    traits: { complexity: 92, adoption: 88, scalability: 95, influence: 97 },
-    description: "Architecture using self-attention mechanisms, revolutionizing NLP and beyond.",
-    year: 2017, fields: ["NLP", "AI", "Sequence Modeling"],
-  },
-  {
-    id: "backpropagation", label: "Backpropagation", x: 280, y: 130, size: 23,
-    color: "hsl(170, 70%, 45%)", glowColor: "hsl(170, 70%, 45%)", category: "Mathematics",
-    connections: ["neural-networks", "gradient-descent"],
-    traits: { complexity: 70, adoption: 98, scalability: 85, influence: 90 },
-    description: "Algorithm for computing gradients in neural networks via the chain rule.",
-    year: 1986, fields: ["Mathematics", "AI", "Optimization"],
-  },
-  {
-    id: "attention", label: "Attention Mechanism", x: -370, y: -60, size: 25,
-    color: "hsl(210, 80%, 55%)", glowColor: "hsl(210, 80%, 55%)", category: "AI",
-    connections: ["transformers", "generative-ai"],
-    traits: { complexity: 80, adoption: 85, scalability: 92, influence: 88 },
-    description: "Mechanism allowing models to focus on relevant parts of input sequences.",
-    year: 2014, fields: ["AI", "NLP", "Computer Vision"],
-  },
-  {
-    id: "generative-ai", label: "Generative AI", x: -140, y: 220, size: 29,
-    color: "hsl(45, 80%, 55%)", glowColor: "hsl(45, 80%, 55%)", category: "AI",
-    connections: ["deep-learning", "attention", "diffusion"],
-    traits: { complexity: 88, adoption: 80, scalability: 90, influence: 92 },
-    description: "AI systems capable of generating novel content: text, images, code, and more.",
-    year: 2014, fields: ["AI", "Creative Computing", "NLP"],
-  },
-  {
-    id: "gradient-descent", label: "Gradient Descent", x: 430, y: 40, size: 21,
-    color: "hsl(140, 60%, 45%)", glowColor: "hsl(140, 60%, 45%)", category: "Mathematics",
-    connections: ["backpropagation"],
-    traits: { complexity: 50, adoption: 99, scalability: 80, influence: 85 },
-    description: "Iterative optimization algorithm for minimizing loss functions.",
-    year: 1847, fields: ["Mathematics", "Optimization"],
-  },
-  {
-    id: "diffusion", label: "Diffusion Models", x: -310, y: 240, size: 24,
-    color: "hsl(290, 65%, 50%)", glowColor: "hsl(290, 65%, 50%)", category: "AI",
-    connections: ["generative-ai"],
-    traits: { complexity: 88, adoption: 70, scalability: 82, influence: 78 },
-    description: "Generative models that learn to reverse a noise diffusion process.",
-    year: 2020, fields: ["AI", "Computer Vision", "Generative Models"],
-  },
-  {
-    id: "quantum-ml", label: "Quantum ML", x: 360, y: -220, size: 22,
-    color: "hsl(200, 90%, 55%)", glowColor: "hsl(200, 90%, 55%)", category: "Quantum",
-    connections: ["neural-networks"],
-    traits: { complexity: 98, adoption: 15, scalability: 60, influence: 45 },
-    description: "Intersection of quantum computing and machine learning for exponential speedups.",
-    year: 2014, fields: ["Quantum Computing", "AI", "Physics"],
-  },
-  {
-    id: "neuro-symbolic", label: "Neuro-Symbolic AI", x: 140, y: -300, size: 23,
-    color: "hsl(30, 80%, 55%)", glowColor: "hsl(30, 80%, 55%)", category: "AI",
-    connections: ["neural-networks", "deep-learning"],
-    traits: { complexity: 85, adoption: 30, scalability: 70, influence: 55 },
-    description: "Combining neural networks with symbolic reasoning for more robust AI.",
-    year: 2019, fields: ["AI", "Logic", "Cognitive Science"],
-  },
+    id: "genesis", label: "Genesis Slate", x: 0, y: 0, size: 30,
+    color: "hsl(180, 100%, 50%)", glowColor: "hsl(180, 100%, 50%)", category: "System",
+    connections: [],
+    traits: { complexity: 10, adoption: 100, scalability: 100, influence: 100 },
+    description: "The beginning of your sequence.",
+    year: 2026, fields: ["Creation"],
+  }
 ];
 
 // Domain-specific additional nodes
-const DOMAIN_NODES: Record<string, IdeaNode[]> = {
-  neuroscience: [
-    { id: "brain-plasticity", label: "Brain Plasticity", x: -180, y: 350, size: 24, color: "hsl(160, 70%, 50%)", glowColor: "hsl(160, 70%, 50%)", category: "Neuroscience", connections: ["neural-networks"], traits: { complexity: 80, adoption: 60, scalability: 50, influence: 85 }, description: "The brain's ability to reorganize itself by forming new neural connections.", year: 1948, fields: ["Neuroscience", "Psychology"] },
-    { id: "consciousness", label: "Consciousness", x: 180, y: 350, size: 26, color: "hsl(280, 60%, 60%)", glowColor: "hsl(280, 60%, 60%)", category: "Neuroscience", connections: ["neural-networks", "brain-plasticity"], traits: { complexity: 99, adoption: 40, scalability: 30, influence: 95 }, description: "The hard problem — understanding subjective experience and awareness.", year: 1994, fields: ["Neuroscience", "Philosophy"] },
-  ],
-  robotics: [
-    { id: "reinforcement-learning", label: "Reinforcement Learning", x: -400, y: 350, size: 25, color: "hsl(100, 70%, 45%)", glowColor: "hsl(100, 70%, 45%)", category: "Robotics", connections: ["neural-networks", "deep-learning"], traits: { complexity: 85, adoption: 70, scalability: 75, influence: 80 }, description: "Learning through interaction with environments via rewards and penalties.", year: 1992, fields: ["AI", "Robotics", "Game Theory"] },
-    { id: "embodied-ai", label: "Embodied AI", x: 400, y: 350, size: 22, color: "hsl(50, 80%, 50%)", glowColor: "hsl(50, 80%, 50%)", category: "Robotics", connections: ["reinforcement-learning", "neural-networks"], traits: { complexity: 90, adoption: 30, scalability: 55, influence: 65 }, description: "AI that learns through physical interaction with the real world.", year: 2018, fields: ["Robotics", "AI", "Embodiment"] },
-  ],
-  physics: [
-    { id: "quantum-computing", label: "Quantum Computing", x: 450, y: -100, size: 26, color: "hsl(220, 90%, 60%)", glowColor: "hsl(220, 90%, 60%)", category: "Physics", connections: ["quantum-ml"], traits: { complexity: 99, adoption: 10, scalability: 95, influence: 90 }, description: "Computing using quantum-mechanical phenomena like superposition and entanglement.", year: 1980, fields: ["Physics", "Computing"] },
-    { id: "string-theory", label: "String Theory", x: 500, y: -300, size: 20, color: "hsl(340, 70%, 55%)", glowColor: "hsl(340, 70%, 55%)", category: "Physics", connections: ["quantum-computing"], traits: { complexity: 99, adoption: 20, scalability: 40, influence: 70 }, description: "Theoretical framework where point-like particles are replaced by one-dimensional strings.", year: 1970, fields: ["Physics", "Mathematics"] },
-  ],
-};
+const DOMAIN_NODES: Record<string, IdeaNode[]> = {};
 
 interface Props {
-  onSelectNode: (node: IdeaNode | null) => void;
-  selectedNode: IdeaNode | null;
+  onSequenceChange: (seq: IdeaNode[]) => void;
+  selectedSequence: IdeaNode[];
   discoveredNodes?: IdeaNode[];
   activeDomain?: string | null;
   highlightedNodeIds?: string[];
+  onConnect?: (sourceId: string, targetId: string) => void;
 }
 
-const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], activeDomain, highlightedNodeIds = [] }: Props) => {
+const KnowledgeGraph = ({ onSequenceChange, selectedSequence, discoveredNodes = [], activeDomain, highlightedNodeIds = [], onConnect }: Props) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
@@ -143,6 +59,9 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [birthTimes, setBirthTimes] = useState<Record<string, number>>({});
   const seenDiscoveredRef = useRef<Set<string>>(new Set());
+
+  // Connecting Nodes State
+  const [dragSource, setDragSource] = useState<string | null>(null);
 
   // Merge base nodes with domain and discovered nodes — stamp birth times
   const domainExtra = activeDomain ? (DOMAIN_NODES[activeDomain] || []) : [];
@@ -227,6 +146,13 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        {/* Sequence Arrow Marker */}
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(180, 80%, 60%)" />
+        </marker>
+        <marker id="arrow-glow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="white" opacity="0.8" />
+        </marker>
       </defs>
 
       <g transform={`translate(${centerX + offset.x}, ${centerY + offset.y}) scale(${scale})`}>
@@ -269,20 +195,48 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
             cy={neb.y + Math.cos(time * 0.2 + i) * 8}
             r={neb.r}
             fill={`hsl(${neb.hue}, 60%, 40%)`}
-            opacity={0.015}
             filter="url(#blur-mega)"
           />
         ))}
+
+        {/* Dynamic Drag Connection Line */}
+        {dragSource && (() => {
+          const sourceNode = allNodes.find(n => n.id === dragSource);
+          if (sourceNode) {
+            const mx = (mousePos.x - centerX - offset.x) / scale;
+            const my = (mousePos.y - centerY - offset.y) / scale;
+            return (
+              <line 
+                x1={sourceNode.x} y1={sourceNode.y} 
+                x2={mx} y2={my} 
+                stroke="hsl(180, 80%, 60%)" 
+                strokeWidth={2} 
+                strokeDasharray="4 4" 
+                opacity={0.8} 
+              />
+            );
+          }
+          return null;
+        })()}
 
         {/* Connection lines with depth */}
         {allNodes.map((node) =>
           node.connections.map((connId) => {
             const target = allNodes.find((n) => n.id === connId);
             if (!target) return null;
+            
+            const isNodeInSeq = selectedSequence.some(s => s.id === node.id);
+            const isTargetInSeq = selectedSequence.some(s => s.id === connId);
             const isHighlighted =
-              selectedNode?.id === node.id || selectedNode?.id === connId ||
+              isNodeInSeq || isTargetInSeq ||
               hoveredNode === node.id || hoveredNode === connId ||
               highlightedNodeIds.includes(node.id) || highlightedNodeIds.includes(connId);
+
+            // Don't draw the normal connection if it's an active sequence edge
+            const isSequenceEdge = selectedSequence.findIndex(s => s.id === node.id) !== -1 && 
+                                   selectedSequence.findIndex(s => s.id === connId) !== -1;
+
+            if (isSequenceEdge) return null;
 
             const midX = (node.x + target.x) / 2 + Math.sin(time * 0.6 + node.y * 0.01) * 20;
             const midY = (node.y + target.y) / 2 + Math.cos(time * 0.5 + node.x * 0.01) * 20;
@@ -316,8 +270,8 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
         )}
 
         {/* Energy pulses along highlighted connections */}
-        {(selectedNode || hoveredNode) && allNodes.filter(
-          n => n.id === (selectedNode?.id || hoveredNode)
+        {(selectedSequence.length > 0 || hoveredNode) && allNodes.filter(
+          n => n.id === (selectedSequence[selectedSequence.length - 1]?.id || hoveredNode)
         ).map(node =>
           node.connections.map((connId, ci) => {
             const target = allNodes.find((n) => n.id === connId);
@@ -364,17 +318,52 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
           });
         })}
 
+        {/* Sequence Path (The Storyboard Timeline) */}
+        {selectedSequence.length > 1 && selectedSequence.map((node, idx) => {
+          if (idx === selectedSequence.length - 1) return null;
+          const target = selectedSequence[idx + 1];
+          // We draw a straight, intense laser beam for the sequence edge
+          return (
+            <g key={`seq-${node.id}-${target.id}`}>
+              <line
+                x1={node.x} y1={node.y}
+                x2={target.x} y2={target.y}
+                stroke="hsl(180, 80%, 60%)"
+                strokeWidth={5}
+                strokeOpacity={0.6}
+                filter="url(#blur-heavy)"
+              />
+              <line
+                x1={node.x} y1={node.y}
+                x2={target.x} y2={target.y}
+                stroke="white"
+                strokeWidth={2}
+                strokeOpacity={0.9}
+                markerEnd="url(#arrow-glow)"
+              />
+              {/* Animated particle traveling along the sequence path */}
+              <circle r={4} fill="white" filter="url(#blur-light)">
+                <animateMotion 
+                  dur="1.5s" 
+                  repeatCount="indefinite" 
+                  path={`M ${node.x} ${node.y} L ${target.x} ${target.y}`} 
+                />
+              </circle>
+            </g>
+          );
+        })}
+
         {/* Nodes */}
         {allNodes.map((node) => {
-          const isSelected = selectedNode?.id === node.id;
+          const isSelected = selectedSequence.some(s => s.id === node.id);
           const isHovered = hoveredNode === node.id;
-          const isConnected = selectedNode?.connections.includes(node.id);
+          const isConnected = selectedSequence.some(s => s.connections.includes(node.id));
           const isHighlightTarget = highlightedNodeIds.includes(node.id);
           const floatY = Math.sin(time * 0.6 + node.x * 0.004 + node.y * 0.004) * 5;
           const floatX = Math.cos(time * 0.4 + node.y * 0.003) * 3;
           const pulseScale = 1 + Math.sin(time * 1.8 + node.x * 0.01) * 0.04;
           const active = isSelected || isHovered || isHighlightTarget;
-          const dimmed = selectedNode && !isSelected && !isConnected && !isHighlightTarget;
+          const dimmed = selectedSequence.length > 0 && !isSelected && !isConnected && !isHighlightTarget;
           const nodeBirthTime = node.isDiscovered ? birthTimes[node.id] : undefined;
           const isBorn = nodeBirthTime !== undefined && (time - nodeBirthTime) < 2;
           const birthAge = nodeBirthTime !== undefined ? time - nodeBirthTime : 0;
@@ -385,7 +374,57 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
               key={node.id}
               className="idea-node cursor-pointer"
               transform={`translate(${node.x + floatX}, ${node.y + floatY}) scale(${birthScale})`}
-              onClick={(e) => { e.stopPropagation(); onSelectNode(isSelected ? null : node); }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                setDragSource(node.id);
+              }}
+              onMouseUp={(e) => {
+                e.stopPropagation();
+                if (dragSource && dragSource !== node.id) {
+                  onConnect?.(dragSource, node.id);
+                }
+                setDragSource(null);
+              }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                
+                // Traverse connected nodes to build the cinematic sequence automatically!
+                const getConnectedPath = (startNode: IdeaNode): IdeaNode[] => {
+                  const path: IdeaNode[] = [];
+                  const visited = new Set<string>();
+                  const queue: IdeaNode[] = [startNode];
+                  
+                  while (queue.length > 0) {
+                    const current = queue.shift()!;
+                    if (visited.has(current.id)) continue;
+                    
+                    visited.add(current.id);
+                    path.push(current);
+                    
+                    // Add all connected children to the queue
+                    for (const connId of current.connections) {
+                      const child = allNodes.find(n => n.id === connId);
+                      if (child && !visited.has(child.id)) {
+                        queue.push(child);
+                      }
+                    }
+                  }
+                  return path;
+                };
+
+                if (e.shiftKey) {
+                  // Append to sequence manually
+                  if (!isSelected) {
+                    onSequenceChange([...selectedSequence, node]);
+                  } else if (selectedSequence[selectedSequence.length - 1]?.id === node.id) {
+                    onSequenceChange(selectedSequence.slice(0, -1));
+                  }
+                } else {
+                  // Automatically select the entire chain of connections starting at this node
+                  const autoPath = getConnectedPath(node);
+                  onSequenceChange(isSelected && selectedSequence.length === autoPath.length ? [] : autoPath); 
+                }
+              }}
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
               style={{ transition: "opacity 0.4s" }}
@@ -407,6 +446,44 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
                     fill={node.color}
                     opacity={0.15 * (1 - Math.min(1, birthAge / 1.5))}
                     filter="url(#blur-heavy)"
+                  />
+                </>
+              )}
+
+              {/* GOD-TIER TIMELINE SYNC: Intense pulsing aura when this node's shot is actively playing */}
+              {isHighlightTarget && (
+                <>
+                  {/* Massive expanding pulse ring */}
+                  <circle
+                    r={node.size * (2.5 + Math.sin(time * 3) * 0.8)}
+                    fill="none"
+                    stroke="hsl(40, 100%, 60%)"
+                    strokeWidth={3 + Math.sin(time * 4) * 1.5}
+                    opacity={0.6 + Math.sin(time * 3) * 0.3}
+                  />
+                  {/* Secondary counter-pulse */}
+                  <circle
+                    r={node.size * (3.2 + Math.cos(time * 2.5) * 0.6)}
+                    fill="none"
+                    stroke="hsl(180, 100%, 60%)"
+                    strokeWidth={1.5}
+                    strokeDasharray="6 4"
+                    opacity={0.4 + Math.sin(time * 5) * 0.2}
+                    style={{ transform: `rotate(${time * 90}deg)`, transformOrigin: "center" }}
+                  />
+                  {/* Core intense glow aura */}
+                  <circle
+                    r={node.size * 3}
+                    fill="hsl(40, 100%, 55%)"
+                    opacity={0.12 + Math.sin(time * 3) * 0.06}
+                    filter="url(#blur-heavy)"
+                  />
+                  {/* Inner bright halo */}
+                  <circle
+                    r={node.size * 1.8}
+                    fill="hsl(180, 100%, 70%)"
+                    opacity={0.15 + Math.sin(time * 4) * 0.08}
+                    filter="url(#blur-light)"
                   />
                 </>
               )}
@@ -464,6 +541,22 @@ const KnowledgeGraph = ({ onSelectNode, selectedNode, discoveredNodes = [], acti
                       />
                     );
                   })}
+                  {/* Sequence Order Number */}
+                  {isSelected && (
+                    <g transform={`translate(${node.size * 1.5}, -${node.size * 1.5})`}>
+                      <circle r={12} fill="hsl(180, 80%, 20%)" stroke="hsl(180, 80%, 60%)" strokeWidth={2} />
+                      <text 
+                        y={4} 
+                        textAnchor="middle" 
+                        fill="white" 
+                        fontSize="12" 
+                        fontFamily="JetBrains Mono, monospace" 
+                        fontWeight="bold"
+                      >
+                        {selectedSequence.findIndex(s => s.id === node.id) + 1}
+                      </text>
+                    </g>
+                  )}
                 </>
               )}
 

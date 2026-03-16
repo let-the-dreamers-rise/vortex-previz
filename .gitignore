@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.pyc
+__pycache__/
+backend/.env
+backend/venv/
+/test_*.py
+/test_*.txt
+/test.jpg
+/trigger_out.txt

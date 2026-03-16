@@ -46,7 +46,7 @@ The following files in this repository demonstrate direct use of Google Cloud se
 flowchart LR
     A["React + Vite (Frontend)"] --> B["3D Narrative Graph"]
     B --> C["FastAPI (Cloud Run)"]
-    C --> D["Gemini 1.5 Pro\n(Orchestrator)"]
+    C --> D["Gemini 3.1 Pro\n(Orchestrator)"]
     D --> E["Veo 3.1\n(Video)"]
     D --> F["Imagen 4\n(Keyframes)"]
     C --> G["Firestore\n(Persistence)"]
